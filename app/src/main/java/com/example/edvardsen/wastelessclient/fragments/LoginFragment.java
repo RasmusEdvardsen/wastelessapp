@@ -11,8 +11,10 @@ import android.widget.Button;
 import android.widget.EditText;
 import com.example.edvardsen.wastelessclient.R;
 import com.example.edvardsen.wastelessclient.miscellaneous.Constants;
+import com.example.edvardsen.wastelessclient.services.JSONService;
 
 import org.json.JSONArray;
+import org.json.JSONObject;
 
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
@@ -60,20 +62,15 @@ public class LoginFragment extends Fragment {
 
                             // Create connection
                             HttpURLConnection httpURLConnection = (HttpURLConnection) loginURL.openConnection();
-                            httpURLConnection.connect();
-                            Log.i("information", "asd");
+                            Log.i("information", String.valueOf(httpURLConnection.getResponseCode()));
 
-                            //Read JSON //TODO: PUT IN JSON SERVICE IN MISCELLANEOUS
-                            BufferedReader streamReader = new BufferedReader(new InputStreamReader(httpURLConnection.getInputStream(), "UTF-8"));
-                            StringBuilder responseStrBuilder = new StringBuilder();
-                            String inputStr;
-                            while ((inputStr = streamReader.readLine()) != null)
-                                responseStrBuilder.append(inputStr);
-                            JSONArray json = new JSONArray(responseStrBuilder.toString());
+                            if(httpURLConnection.getResponseCode() == 200){
+                                JSONObject jsonObject = JSONService.toJSONObject(httpURLConnection.getInputStream());
+                                Log.i("information", jsonObject.toString());
+                            }
 
-                            Log.i("information", json.toString());
                         }catch (Exception e){
-                            Log.e("loginasync", e.toString());
+                            Log.e("information", e.toString());
                         }
                     }
                 });
@@ -83,8 +80,29 @@ public class LoginFragment extends Fragment {
         signup.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                String emailInput = email.getText().toString();
-                String passwordInput = password.getText().toString();
+                final String emailInput = email.getText().toString();
+                final String passwordInput = password.getText().toString();
+                AsyncTask.execute(new Runnable() {
+                    @Override
+                    public void run() {
+                        try{
+                            // Create URL
+                            URL loginURL = new URL(Constants.baseURL + Constants.loginPath + "/?email=" + emailInput + "&password=" + passwordInput);
+
+                            // Create connection
+                            HttpURLConnection httpURLConnection = (HttpURLConnection) loginURL.openConnection();
+                            Log.i("information", String.valueOf(httpURLConnection.getResponseCode()));
+
+                            if(httpURLConnection.getResponseCode() == 200){
+                                JSONObject jsonObject = JSONService.toJSONObject(httpURLConnection.getInputStream());
+                                Log.i("information", jsonObject.toString());
+                            }
+
+                        }catch (Exception e){
+                            Log.e("information", e.toString());
+                        }
+                    }
+                });
             }
         });
     }
