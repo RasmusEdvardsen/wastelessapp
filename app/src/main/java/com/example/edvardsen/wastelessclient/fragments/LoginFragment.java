@@ -3,7 +3,6 @@ package com.example.edvardsen.wastelessclient.fragments;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
-import android.util.JsonReader;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -14,18 +13,11 @@ import com.example.edvardsen.wastelessclient.R;
 import com.example.edvardsen.wastelessclient.miscellaneous.Constants;
 
 import org.json.JSONArray;
-import org.json.JSONObject;
 
-import java.io.InputStream;
+import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
-
-import javax.net.ssl.HttpsURLConnection;
-
-import okhttp3.OkHttpClient;
-import okhttp3.Request;
-import okhttp3.Response;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -64,27 +56,22 @@ public class LoginFragment extends Fragment {
                     public void run() {
                         try{
                             // Create URL
-                            URL loginURL = new URL("http://192.168.43.229:64354/api/users/?email=asd&password=asd");
+                            URL loginURL = new URL(Constants.baseURL + Constants.loginPath + "/?email=" + emailInput + "&password=" + passwordInput);
 
                             // Create connection
                             HttpURLConnection httpURLConnection = (HttpURLConnection) loginURL.openConnection();
-
+                            httpURLConnection.connect();
                             Log.i("information", "asd");
-                            InputStream responseBody = httpURLConnection.getInputStream();
-                            InputStreamReader responseBodyReader = new InputStreamReader(responseBody, "UTF-8");
 
-                            Log.i("information", "zxc");
+                            //Read JSON //TODO: PUT IN JSON SERVICE IN MISCELLANEOUS
+                            BufferedReader streamReader = new BufferedReader(new InputStreamReader(httpURLConnection.getInputStream(), "UTF-8"));
+                            StringBuilder responseStrBuilder = new StringBuilder();
+                            String inputStr;
+                            while ((inputStr = streamReader.readLine()) != null)
+                                responseStrBuilder.append(inputStr);
+                            JSONArray json = new JSONArray(responseStrBuilder.toString());
 
-                            JsonReader jsonReader = new JsonReader(responseBodyReader);
-                            String output = "";
-                            jsonReader.beginObject(); // Start processing the JSON object
-                            while (jsonReader.hasNext()) { // Loop through all keys
-                                String key = jsonReader.nextName(); // Fetch the next key
-                                String value = jsonReader.nextString();
-                                output += key + ": ";
-                                output += value + "\n";
-                            }
-                            Log.i("information", output);
+                            Log.i("information", json.toString());
                         }catch (Exception e){
                             Log.e("loginasync", e.toString());
                         }
@@ -98,97 +85,7 @@ public class LoginFragment extends Fragment {
             public void onClick(View view) {
                 String emailInput = email.getText().toString();
                 String passwordInput = password.getText().toString();
-                new Signup().executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, "http://localhost:64354/api/users/?email=asd&password=asd");
             }
         });
     }
-
-    public static class Login extends AsyncTask<String, Void, JSONArray> {
-        @Override
-        protected JSONArray doInBackground(String... params) {
-            JSONArray jsonArray = null;
-            Response response = null;
-            try{
-                try {
-                    String url = params[0];
-                    OkHttpClient client = new OkHttpClient();
-                    Request request = new Request.Builder()
-                            .url(url)
-                            .build();
-                    response = client.newCall(request).execute();
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
-                if(response == null) return null;
-                jsonArray = new JSONArray(response.body().string());
-            }catch (Exception e){
-                //TODO: log
-                Log.e("loginauthbg", e.toString());
-            }
-            if(response != null){
-                if(response.code() == 200){
-                    return jsonArray;
-                }
-            }
-            return null;
-        }
-
-        @Override
-        protected void onPostExecute(JSONArray jsonArray) {
-            super.onPostExecute(jsonArray);
-            try{
-                if(jsonArray == null){
-                    Log.i("information", "jsonArray is null");
-                }else{
-                    JSONObject jsonObject = jsonArray.getJSONObject(0);
-                    Log.i("rspbody", jsonObject.toString());
-                }
-            }catch (Exception e) {e.printStackTrace();}
-        }
-    }
-
-    public static class Signup extends AsyncTask<String, Void, JSONArray> {
-        @Override
-        protected JSONArray doInBackground(String... params) {
-            JSONArray jsonArray = null;
-            Response response = null;
-            try{
-                try {
-                    String url = params[0];
-                    OkHttpClient client = new OkHttpClient();
-                    Request request = new Request.Builder()
-                            .url(url)
-                            .build();
-                    response = client.newCall(request).execute();
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
-                if(response == null) return null;
-                jsonArray = new JSONArray(response.body().string());
-            }catch (Exception e){
-                //TODO: log
-                Log.e("loginauthbg", e.toString());
-            }
-            if(response != null){
-                if(response.code() == 200){
-                    return jsonArray;
-                }
-            }
-            return null;
-        }
-
-        @Override
-        protected void onPostExecute(JSONArray jsonArray) {
-            super.onPostExecute(jsonArray);
-            try{
-                if(jsonArray == null){
-                    Log.i("information", "jsonArray is null");
-                }else{
-                    JSONObject jsonObject = jsonArray.getJSONObject(0);
-                    Log.i("rspbody", jsonObject.toString());
-                }
-            }catch (Exception e) {e.printStackTrace();}
-        }
-    }
-
 }
