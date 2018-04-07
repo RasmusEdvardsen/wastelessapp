@@ -2,6 +2,8 @@ package com.example.edvardsen.wastelessclient.activities;
 
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.os.Handler;
+import android.os.Message;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -42,7 +44,6 @@ public class MainActivity extends AppCompatActivity {
                     Toast.makeText(MainActivity.this, "Could not set up the detector!", Toast.LENGTH_SHORT).show();
                     return;
                 }
-
                 Frame frame = new Frame.Builder().setBitmap(myBitmap).build();
                 SparseArray<Barcode> barcodes = detector.detect(frame);
 
@@ -51,5 +52,11 @@ public class MainActivity extends AppCompatActivity {
                 txtView.setText(thisCode.rawValue);
             }
         });
+
+
+    }
+
+    public static void setVisibility(View view, Integer integer){
+        view.setVisibility(integer);
     }
 }

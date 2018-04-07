@@ -8,9 +8,13 @@ import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ProgressBar;
+import android.widget.RelativeLayout;
+import android.widget.Toast;
 
 import com.example.edvardsen.wastelessclient.R;
 import com.example.edvardsen.wastelessclient.miscellaneous.Constants;
+import com.example.edvardsen.wastelessclient.services.HandlerService;
 import com.example.edvardsen.wastelessclient.services.JSONService;
 
 import org.json.JSONObject;
@@ -19,11 +23,13 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 
 public class LoginActivity extends AppCompatActivity {
+    RelativeLayout relativeLayout;
     EditText email;
     EditText password;
     Button login;
     Button signup;
-
+    RelativeLayout relativeLayoutProgressBar;
+    ProgressBar progressBar;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -32,10 +38,14 @@ public class LoginActivity extends AppCompatActivity {
 
         //TODO: NEW CLASS THAT CHECK IF UTIL.GETTOKEN THEN START MAIN ACT INSTEAD OF LOGIN ACT
 
+        relativeLayout = findViewById(R.id.activity_login_relativelayout);
         email = findViewById(R.id.email);
         password = findViewById(R.id.password);
         login = findViewById(R.id.loginButton);
         signup = findViewById(R.id.signupButton);
+        relativeLayoutProgressBar = findViewById(R.id.activity_login_relativelayout_progressbar);
+        progressBar = findViewById(R.id.activity_login_progressbar);
+        progressBar.setIndeterminate(true);
 
         login.setOnClickListener(new View.OnClickListener(){
 
@@ -47,6 +57,7 @@ public class LoginActivity extends AppCompatActivity {
                     @Override
                     public void run() {
                         try{
+                            HandlerService.setVisibility(relativeLayoutProgressBar, View.VISIBLE);
                             // Create URL
                             URL loginURL = new URL(Constants.baseURL + Constants.loginPath + "/?email=" + emailInput + "&password=" + passwordInput);
 
@@ -59,10 +70,11 @@ public class LoginActivity extends AppCompatActivity {
                                 Log.i("information", jsonObject.toString());
                                 startActivity(new Intent(getBaseContext(), MainActivity.class));
                             }
-
                         }catch (Exception e){
                             Log.e("information", e.toString());
                         }
+                        HandlerService.setVisibility(relativeLayoutProgressBar, View.GONE);
+                        HandlerService.makeToast(getBaseContext(), "Something went wrong.", Toast.LENGTH_SHORT);
                     }
                 });
             }
