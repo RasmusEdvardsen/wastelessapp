@@ -7,6 +7,7 @@ import android.os.Message;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.util.Log;
 import android.util.SparseArray;
 import android.view.View;
 import android.widget.Button;
@@ -15,6 +16,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.edvardsen.wastelessclient.R;
+import com.example.edvardsen.wastelessclient.data.UserModel;
 import com.google.android.gms.vision.Frame;
 import com.google.android.gms.vision.barcode.Barcode;
 import com.google.android.gms.vision.barcode.BarcodeDetector;
@@ -52,8 +54,6 @@ public class MainActivity extends AppCompatActivity {
                 txtView.setText(thisCode.rawValue);
             }
         });
-
-
     }
 
     public static void setVisibility(View view, Integer integer){
