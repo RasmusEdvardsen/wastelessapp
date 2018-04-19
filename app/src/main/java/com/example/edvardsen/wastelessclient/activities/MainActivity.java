@@ -19,7 +19,6 @@ public class MainActivity extends AppCompatActivity  {
     private Button ocrBtn;
     private Button inventoryBtn;
 
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);

@@ -26,11 +26,10 @@ import static android.Manifest.permission.CAMERA;
 
 public class OcrActivity extends AppCompatActivity {
 
-    SurfaceView cameraView;
-    TextView textView;
-    CameraSource cameraSource;
-    final int RequestCameraPermissionID = 1001;
-
+   SurfaceView cameraView;
+   TextView textView;
+   CameraSource cameraSource;
+   final int RequestCameraPermissionID = 1001;
 
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
@@ -39,7 +38,7 @@ public class OcrActivity extends AppCompatActivity {
             {
                 if(grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                     if(ActivityCompat.checkSelfPermission(OcrActivity.this, CAMERA)
-                            != PackageManager.PERMISSION_GRANTED)   {
+                          != PackageManager.PERMISSION_GRANTED)   {
                         return;
                     }
                     try {
@@ -78,17 +77,17 @@ public class OcrActivity extends AppCompatActivity {
                 @Override
                 public void surfaceCreated(SurfaceHolder surfaceHolder) {
                     try{
-                        if (ActivityCompat.checkSelfPermission(OcrActivity.this, CAMERA)
-                                != PackageManager.PERMISSION_GRANTED){
-                            ActivityCompat.requestPermissions(OcrActivity.this,
-                                    new String[] {CAMERA},RequestCameraPermissionID);
-                            return;
+                       if (ActivityCompat.checkSelfPermission(OcrActivity.this, CAMERA)
+                               != PackageManager.PERMISSION_GRANTED){
+                           ActivityCompat.requestPermissions(OcrActivity.this,
+                                   new String[] {CAMERA},RequestCameraPermissionID);
+                           return;
 
                            /* requestPermissions(new String[]{CAMERA}, */
-                        }
+                       }                                                               
                         cameraSource.start(cameraView.getHolder());
                     }  catch(IOException e){
-                        e.printStackTrace();
+                         e.printStackTrace();
                     }
                 }
 
@@ -106,26 +105,25 @@ public class OcrActivity extends AppCompatActivity {
             textRecognizer.setProcessor(new Detector.Processor<TextBlock>() {
                 @Override
                 public void release() {
-
                 }
 
                 @Override
                 public void receiveDetections(Detector.Detections<TextBlock> detections) {
-                    final SparseArray<TextBlock> items =detections.getDetectedItems();
-                    if(items.size()!=0){
-                        textView.post(new Runnable() {
-                            @Override
-                            public void run() {
-                                StringBuilder stringBuilder = new StringBuilder();
-                                for(int i = 0; i<items.size(); i++){
-                                    TextBlock item = items.valueAt(i);
-                                    stringBuilder.append(item.getValue());
-                                    stringBuilder.append("\n");
-                                }
-                                textView.setText(stringBuilder.toString());
-                            }
-                        }) ;
-                    }
+                   final SparseArray<TextBlock> items =detections.getDetectedItems();
+                   if(items.size()!=0){
+                       textView.post(new Runnable() {
+                           @Override
+                           public void run() {
+                               StringBuilder stringBuilder = new StringBuilder();
+                               for(int i = 0; i<items.size(); i++){
+                                   TextBlock item = items.valueAt(i);
+                                   stringBuilder.append(item.getValue());
+                                   stringBuilder.append("\n");
+                               }
+                               textView.setText(stringBuilder.toString());
+                           }
+                       }) ;
+                   }
                 }
             });
         }

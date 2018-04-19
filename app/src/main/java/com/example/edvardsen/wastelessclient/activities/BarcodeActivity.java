@@ -51,7 +51,6 @@ public class BarcodeActivity extends AppCompatActivity implements ZXingScannerVi
     Button Ok;
     TextView barcode;
 
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -226,7 +225,6 @@ public class BarcodeActivity extends AppCompatActivity implements ZXingScannerVi
                 });
                 scannerView.stopCameraPreview();
                 //scannerView.resumeCameraPreview(BarcodeActivity.this);
-
             }
         });
         builder.setNeutralButton("Visit", new DialogInterface.OnClickListener() {
