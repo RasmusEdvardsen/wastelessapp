@@ -18,8 +18,18 @@
         <Button
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Process"
-            android:id="@+id/button" />
+            android:text="Scan Barcode"
+            android:id="@+id/scanBtn" />
+        <Button
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Inventory"
+            android:id="@+id/inventoryBtn" />
+        <Button
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Scan expiration date"
+            android:id="@+id/ocrBtn" />
         <ImageView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"

@@ -12,6 +12,8 @@ public class UserModel {
     private static String email = "";
     private static String password = "";
 
+    private UserModel (){}
+
     public static UserModel getInstance(){
         if (instance == null){
             instance = new UserModel();

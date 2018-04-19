@@ -31,7 +31,7 @@ public class JSONService {
     }
 
     public static JSONObject toJSONObject(InputStream inputStream){
-        JSONObject jsonObject= null;
+        JSONObject jsonObject = null;
         try{
             //Read JSON
             BufferedReader streamReader = new BufferedReader(new InputStreamReader(inputStream, "UTF-8"));
