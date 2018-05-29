@@ -11,6 +11,7 @@ public class UserModel {
     private static String lastName = "";
     private static String email = "";
     private static String password = "";
+    private static int userID = -1;
 
     private UserModel (){}
 
@@ -31,6 +32,12 @@ public class UserModel {
 
     public static String getEmail() {
         return email;
+    }
+
+    public static int getUserID(){return userID;}
+
+    public static void setUserID(int userID) {
+        UserModel.userID = userID;
     }
 
     public static String getPassword() {

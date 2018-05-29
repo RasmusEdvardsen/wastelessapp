@@ -1,5 +1,7 @@
 package com.example.edvardsen.wastelessclient.activities;
 
+
+import android.app.Activity;
 import android.content.pm.PackageManager;
 import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
@@ -10,26 +12,34 @@ import android.util.SparseArray;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 import android.widget.TextView;
+import android.widget.Toast;
 //import android.Manifest;
 
 
 import com.example.edvardsen.wastelessclient.Manifest;
 import com.example.edvardsen.wastelessclient.R;
+import com.example.edvardsen.wastelessclient.data.DateRecog;
 import com.google.android.gms.vision.CameraSource;
 import com.google.android.gms.vision.Detector;
 import com.google.android.gms.vision.text.TextBlock;
 import com.google.android.gms.vision.text.TextRecognizer;
 
 import java.io.IOException;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 
 import static android.Manifest.permission.CAMERA;
 
-public class OcrActivity extends AppCompatActivity {
+public class OcrActivity extends Activity {
 
    SurfaceView cameraView;
    TextView textView;
    CameraSource cameraSource;
    final int RequestCameraPermissionID = 1001;
+    DateRecog dateRecog = new DateRecog();
+   Date OCResult;
+   String[] Parseresults;
 
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
@@ -52,14 +62,18 @@ public class OcrActivity extends AppCompatActivity {
 
         }
     }
+    public void sendResults(Date OCRDate, String Ean){
+
+    }
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_ocr);
 
-        cameraView = (SurfaceView) findViewById(R.id.surfaceView);
-        textView = (TextView) findViewById(R.id.textView);
+       // cameraView = (SurfaceView) findViewById(R.id.surfaceView);
+      //  textView = (TextView) findViewById(R.id.textView);
 
         TextRecognizer textRecognizer = new TextRecognizer.Builder(getApplicationContext()).build();
 
@@ -107,6 +121,8 @@ public class OcrActivity extends AppCompatActivity {
                 public void release() {
                 }
 
+
+
                 @Override
                 public void receiveDetections(Detector.Detections<TextBlock> detections) {
                    final SparseArray<TextBlock> items =detections.getDetectedItems();
@@ -114,13 +130,36 @@ public class OcrActivity extends AppCompatActivity {
                        textView.post(new Runnable() {
                            @Override
                            public void run() {
+
                                StringBuilder stringBuilder = new StringBuilder();
+
                                for(int i = 0; i<items.size(); i++){
                                    TextBlock item = items.valueAt(i);
                                    stringBuilder.append(item.getValue());
                                    stringBuilder.append("\n");
+
+                                   try {
+                                       String test = dateRecog.determineDateFormat(item.getValue());
+                                       SimpleDateFormat formatter = new SimpleDateFormat(test);
+                                       Date date = formatter.parse(item.getValue());
+                                       Log.i("information:",item.getValue() + " testing " +date.toString());
+                                       //String test = dateRecog.determineDateFormat(item.getValue());
+                                       if(false){
+
+                                          // Date returnExpDate = dateRecog.getDate(item.getValue(),test);
+                                          // Log.i("information:",returnExpDate.toString());
+                                           Toast.makeText(getApplicationContext(), "Date found!", Toast.LENGTH_LONG).show();
+                                           Thread.currentThread().interrupt();
+                                       }
+
+
+                                   } catch (Exception e) {
+                                       e.printStackTrace();
+                                   }
                                }
                                textView.setText(stringBuilder.toString());
+
+
                            }
                        }) ;
                    }

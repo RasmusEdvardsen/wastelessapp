@@ -1,9 +1,9 @@
 package com.example.edvardsen.wastelessclient.activities;
 
+import android.app.Activity;
 import android.content.Intent;
 import android.os.AsyncTask;
-import android.os.Handler;
-import android.support.v7.app.AppCompatActivity;
+
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
@@ -23,10 +23,7 @@ import com.google.android.gms.ads.internal.gmsg.HttpClient;
 
 import org.json.JSONObject;
 
-import java.io.BufferedInputStream;
-import java.io.BufferedOutputStream;
-import java.io.InputStream;
-import java.io.OutputStream;
+
 import java.net.HttpURLConnection;
 import java.net.URL;
 
@@ -36,7 +33,7 @@ import okhttp3.Request;
 import okhttp3.RequestBody;
 import okhttp3.Response;
 
-public class LoginActivity extends AppCompatActivity {
+public class LoginActivity extends Activity {
     RelativeLayout relativeLayout;
     EditText email;
     EditText password;
@@ -126,9 +123,14 @@ public class LoginActivity extends AppCompatActivity {
                                 HandlerService.makeToast(getBaseContext(), "Something went wrong.", Toast.LENGTH_SHORT, 500);
                             }else{
                                 if(response.code() == 200){
+                                    JSONObject object  = JSONService.toJSONObject(response.body().byteStream());
+                                    Log.i("information", object.getString("UserID"));
+                                    Log.i("information", String.valueOf(object.length()));
+                                    Log.i("information", object.toString());
                                     UserModel.getInstance();
                                     UserModel.setEmail(emailInput);
                                     UserModel.setPassword(passwordInput);
+UserModel.setUserID((Integer.parseInt(object.getString("UserID"))));
                                     HandlerService.makeToast(getBaseContext(), "Success!", Toast.LENGTH_SHORT, 500);
                                     startActivity(new Intent(getBaseContext(), MainActivity.class));
                                 }else{

@@ -4,42 +4,35 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.hardware.Camera;
-import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Looper;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
-import android.view.LayoutInflater;
 import android.view.View;
-import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.edvardsen.wastelessclient.R;
-import com.example.edvardsen.wastelessclient.data.Codes;
-import com.example.edvardsen.wastelessclient.data.UserModel;
+import com.example.edvardsen.wastelessclient.data.FridgeObjects;
 import com.example.edvardsen.wastelessclient.miscellaneous.Constants;
 import com.example.edvardsen.wastelessclient.services.HandlerService;
-import com.example.edvardsen.wastelessclient.services.JSONService;
+import com.example.edvardsen.wastelessclient.services.ReaderService;
 import com.google.zxing.Result;
 
-import org.json.JSONObject;
 
-import java.io.BufferedReader;
-import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.util.Arrays;
+
 
 import me.dm7.barcodescanner.zxing.ZXingScannerView;
-import okhttp3.MediaType;
-import okhttp3.OkHttpClient;
-import okhttp3.Request;
-import okhttp3.RequestBody;
-import okhttp3.Response;
+
 
 import static android.Manifest.permission.CAMERA;
 
@@ -48,13 +41,23 @@ public class BarcodeActivity extends AppCompatActivity implements ZXingScannerVi
     private static final int REQUEST_CAMERA = 1;
     private ZXingScannerView scannerView;
     private static int camId = Camera.CameraInfo.CAMERA_FACING_BACK;
-    Button Ok;
+
     TextView barcode;
+    final String[] scanResults = new String[3];
+    public String[] getScanResults(){
+        return scanResults;
+    }
+    final  String[] barcodeResults = new String[1];
+
+   public String[] parseResults = new String[10];
+
+
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_barcode);
+       setContentView(R.layout.activity_barcode);
         // barcode = (TextView) findViewById(R.id.barcode);
 
       /*  FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
@@ -83,15 +86,6 @@ public class BarcodeActivity extends AppCompatActivity implements ZXingScannerVi
         }
     }
 
-
-
-    // Button button = findViewById(R.id.button);
-    //button.setOnClickListener(new View.OnClickListener(){
-    //    @Override
-    //   public void onClick(View v){
-
-    // }
-    //});
 
 
     private void requestPermission() {
@@ -168,116 +162,140 @@ public class BarcodeActivity extends AppCompatActivity implements ZXingScannerVi
                 .show();
     }
 
-    @Override
-    public void handleResult(final Result result) {
-        final String myResult = result.getText();
-        Log.d("QRCodeScanner", result.getText());
-        Log.d("QRCodeScanner", result.getBarcodeFormat().toString());
 
-        AlertDialog.Builder builder = new AlertDialog.Builder(this);
-
-        final String barcodeFormat = result.getBarcodeFormat().toString();  /*barcode.getText().toString(); */
-        final String barcode = result.getText();
-        final String url = Constants.baseURL + Constants.usersPath;
-        final String json = "{\"barcode\": " + "\"" + barcodeFormat + "\","
-                + "\"}";
-        builder.setTitle("Scan Result");
-        builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
-            public Codes codes;
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-
-                AsyncTask.execute(new Runnable() {
-
+    /* private void secondDialog(DialogInterface.OnClickListener newListener){
+        new android.support.v7.app.AlertDialog.Builder(BarcodeActivity.this)
+                .setMessage("choose between these:")
+                .setItems(scanResults.indexOf(3), new DialogInterface.OnClickListener() {
                     @Override
-                    public void run() {
-                        Response response = null;
-                        try{
-                            OkHttpClient client = new OkHttpClient();
-                            RequestBody body = RequestBody.create(MediaType.parse("application/json; charset=utf-8"), json);
-                            Request request = new Request.Builder()
-                                    .url(url)
-                                    .post(body)
-                                    .build();
-                            response = client.newCall(request).execute();
-                            if(response == null){
-                                HandlerService.makeToast(getBaseContext(), "Something went wrong.", Toast.LENGTH_SHORT, 500);
-                            }else{
-                                if(response.code() == 200){
-                                    Codes.getBarcode(barcodeFormat);
-                                    codes.getListofCodes(barcodeFormat,null);
-                                    //UserModel.getBarcode(barcode);
+                    public void onClick(DialogInterface dialogInterface, int i) {
 
-                                    HandlerService.makeToast(getBaseContext(), "Success!", Toast.LENGTH_SHORT, 500);
-                                    startActivity(new Intent(getBaseContext(), InventoryActivity.class));
-                                }else{
-                                    HandlerService.makeToast(getBaseContext(), "Something went wrong.", Toast.LENGTH_SHORT, 500);
-                                    Log.i("Barcode", String.valueOf(response.code()));
-                                }
-                            }
-
-
-                        }catch (Exception e){
-                            Log.e("information", e.toString());
-                            HandlerService.makeToast(getBaseContext(), "Something went wrong.", Toast.LENGTH_SHORT, 500);
-                        }
                     }
                 });
+    } */
+
+
+    @Override
+    public void handleResult(final Result result) {
+
+        Log.d("QRCodeScanner", result.getText());
+
+          /*barcode.getText().toString(); */
+        final String barcode = result.getText();
+
+        AsyncTask.execute(new Runnable() {
+            @Override
+            public void run() {
+                try{
+                    // Create URL
+                    URL loginURL = new URL(Constants.baseURL + Constants.scrapePath + "/" + barcode);
+
+                    // Create connection
+                    HttpURLConnection httpURLConnection = (HttpURLConnection) loginURL.openConnection();
+                    Log.i("information", String.valueOf(httpURLConnection.getResponseCode()));
+
+                    if(httpURLConnection.getResponseCode() == 200){
+
+
+                        //TODO: RENAME JSONService to ReaderService, PUT THIS IN TO THAT SERVICE.
+                        //TODO: JSONArray ???
+
+                        String wordOccurrences = ReaderService.ResulttoString(httpURLConnection.getInputStream());
+                        if(wordOccurrences.startsWith("\"")){
+                            wordOccurrences = wordOccurrences.substring(1, wordOccurrences.length());
+                        }
+                        if(wordOccurrences.endsWith("\"")){
+                            wordOccurrences = wordOccurrences.substring(0, wordOccurrences.length()-1);
+                        }
+                        Log.i("information", "aaa" + wordOccurrences);
+                        String[] words = wordOccurrences.split(", ");
+                        Log.i("information", "bbb" + Arrays.toString(words));
+
+                        Log.i("information","TESTTTTTTTTT"+ Arrays.toString(words));
+                        Log.i("information","test2 " + String.valueOf(scanResults.length));
+                        Log.i("information","test3 " + String.valueOf(barcodeResults.length));
+                        Log.i("information","test4 " + String.valueOf(words.length));
+                        scanResults[0]=words[0];
+                        scanResults[1]=words[1];
+                        scanResults[2]=words[2];
+                        barcodeResults[0]=barcode;
+
+                        Log.i("information", "TEST"+scanResults[0]+scanResults[1]+words[2] );
+                        //DU Laver et kald på UI THREAD SOm SKAL GØERS på MAIN :/
+
+                        new Handler(Looper.getMainLooper()).post(new Runnable() {
+                            @Override
+                            public void run() {
+                                HandleResultsLater(result);
+                            }
+                        });
+
+                    }
+                }catch (Exception e){
+                    Log.e("information", e.toString());
+                    HandlerService.makeToast(getBaseContext(), "Something went wrong.", Toast.LENGTH_SHORT, 500);
+                }
+            }
+        });
+
+
+
+    }
+
+
+
+
+    public void HandleResultsLater(final Result result){
+        Log.d("QRCodeScanner", result.getText());
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        Log.i("information2", "ERROR In Handleresult Later");
+        /*barcode.getText().toString(); */
+        final String barcode = result.getText();
+        builder.setTitle("Scan results");
+        HandlerService.setBuilder(this,scanResults);
+        Log.i("information1",scanResults[1]+scanResults[0]);
+
+    builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+        @Override
+        public void onClick(DialogInterface dialogInterface, int i) {
+           Intent intent = new Intent(getBaseContext(), OcrResultActivity.class);
+           intent.putExtra("ean", barcodeResults[0]);
+            startActivity(intent);
+        }
+    });
+
+        //builder.setMessage(result.getText());
+        AlertDialog alert1 = builder.create();
+        alert1.show();
+    }
+    public void secondDialog(final Result result){
+
+
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        final String barcode = result.getText();
+        builder.setTitle("Choose an option");
+
+        builder.setPositiveButton("Scan", new DialogInterface.OnClickListener() {
+
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                scanResults[0] = parseResults[0];
+                scanResults[1] = parseResults[1];
+                scanResults[2] = parseResults[2];
                 scannerView.stopCameraPreview();
+                startActivity(new Intent(getBaseContext(), OcrResultActivity.class));
                 //scannerView.resumeCameraPreview(BarcodeActivity.this);
             }
         });
-        builder.setNeutralButton("Visit", new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-                Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(myResult));
-                startActivity(browserIntent);
-            }
-        });
+
+
         builder.setPositiveButton("Scan More", new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
+                scanResults[0] = parseResults[0];
+                scanResults[1] = parseResults[1];
+                scanResults[2] = parseResults[2];
 
-                AsyncTask.execute(new Runnable() {
-                    @Override
-                    public void run() {
-                        try{
-                            // Create URL
-                            URL loginURL = new URL(Constants.baseURL + Constants.scrapePath + "/" + barcode);
-
-                            // Create connection
-                            HttpURLConnection httpURLConnection = (HttpURLConnection) loginURL.openConnection();
-                            Log.i("information", String.valueOf(httpURLConnection.getResponseCode()));
-
-                            if(httpURLConnection.getResponseCode() == 200){
-
-
-                                //TODO: RENAME JSONService to ReaderService, PUT THIS IN TO THAT SERVICE.
-                                //TODO: JSONArray ???
-                                String test = "";
-                                try{
-                                    //Read JSON
-                                    BufferedReader streamReader = new BufferedReader(new InputStreamReader(httpURLConnection.getInputStream(), "UTF-8"));
-                                    StringBuilder responseStrBuilder = new StringBuilder();
-                                    String inputStr;
-                                    while ((inputStr = streamReader.readLine()) != null)
-                                        responseStrBuilder.append(inputStr);
-                                    test = responseStrBuilder.toString();
-                                    Log.i("information", test);
-                                }catch (Exception e){
-                                    //TODO: Log Exception
-                                    Log.i("information", "failed: " + e.toString());
-                                }
-
-
-
-                            }
-                        }catch (Exception e){
-                            Log.e("information", e.toString());
-                            HandlerService.makeToast(getBaseContext(), "Something went wrong.", Toast.LENGTH_SHORT, 500);
-                        }
-                    }
-                });
                 scannerView.resumeCameraPreview(BarcodeActivity.this);
 
             }
