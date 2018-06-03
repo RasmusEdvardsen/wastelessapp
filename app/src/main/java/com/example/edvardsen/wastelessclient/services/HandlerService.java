@@ -48,6 +48,8 @@ public class HandlerService {
                         //the variable i is the chosen item in the dialog!
                         Log.i("information", "LOG INSIDE HANDLER SERVICE");
                         Log.i("information", String.valueOf(i));
+                        Intent intent = new Intent(ctx, OcrResultActivity.class);
+                        intent.putExtra("choice", i);
                         ctx.startActivity(new Intent(ctx, OcrResultActivity.class));
 
                     }
