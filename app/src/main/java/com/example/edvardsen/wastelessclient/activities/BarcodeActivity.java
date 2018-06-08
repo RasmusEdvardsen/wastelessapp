@@ -207,20 +207,14 @@ public class BarcodeActivity extends AppCompatActivity implements ZXingScannerVi
                         if(wordOccurrences.endsWith("\"")){
                             wordOccurrences = wordOccurrences.substring(0, wordOccurrences.length()-1);
                         }
-                        Log.i("information", "aaa" + wordOccurrences);
                         String[] words = wordOccurrences.split(", ");
-                        Log.i("information", "bbb" + Arrays.toString(words));
-
-                        Log.i("information","TESTTTTTTTTT"+ Arrays.toString(words));
-                        Log.i("information","test2 " + String.valueOf(scanResults.length));
-                        Log.i("information","test3 " + String.valueOf(barcodeResults.length));
-                        Log.i("information","test4 " + String.valueOf(words.length));
+                        Log.i("information", Arrays.toString(words));
                         scanResults[0]=words[0];
                         scanResults[1]=words[1];
                         scanResults[2]=words[2];
                         barcodeResults[0]=barcode;
 
-                        Log.i("information", "TEST"+scanResults[0]+scanResults[1]+words[2] );
+                        Log.i("information", scanResults[0]+scanResults[1]+words[2] );
                         //DU Laver et kald på UI THREAD SOm SKAL GØERS på MAIN :/
 
                         new Handler(Looper.getMainLooper()).post(new Runnable() {
@@ -242,32 +236,23 @@ public class BarcodeActivity extends AppCompatActivity implements ZXingScannerVi
 
     }
 
-
-
-
     public void HandleResultsLater(final Result result){
-        Log.d("QRCodeScanner", result.getText());
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
-        Log.i("information2", "ERROR In Handleresult Later");
-        /*barcode.getText().toString(); */
-        final String barcode = result.getText();
-        builder.setTitle("Scan results");
-        HandlerService.setBuilder(this,scanResults);
-        Log.i("information1",scanResults[1]+scanResults[0]);
+        HandlerService.setBuilder(this, scanResults, barcodeResults[0]);
 
-    builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
-        @Override
-        public void onClick(DialogInterface dialogInterface, int i) {
-           Intent intent = new Intent(getBaseContext(), OcrResultActivity.class);
-           intent.putExtra("ean", barcodeResults[0]);
+        builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialogInterface, int i) {
+            Intent intent = new Intent(getBaseContext(), OcrResultActivity.class);
+            Log.i("information barcode", barcodeResults[0]);
+            intent.putExtra("ean", barcodeResults[0]);
             startActivity(intent);
-        }
-    });
-
-        //builder.setMessage(result.getText());
+            }
+        });
         AlertDialog alert1 = builder.create();
         alert1.show();
     }
+
     public void secondDialog(final Result result){
 
 

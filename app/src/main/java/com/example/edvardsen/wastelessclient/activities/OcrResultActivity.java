@@ -21,6 +21,7 @@ import java.util.Date;
 import java.util.List;
 
 public class OcrResultActivity extends Activity implements View.OnClickListener {
+
     // Use a compound button so either checkbox or switch widgets work.
     private CompoundButton autoFocus;
     private CompoundButton useFlash;
@@ -28,7 +29,7 @@ public class OcrResultActivity extends Activity implements View.OnClickListener 
     private TextView textValue;
     DateRecog dateRecog = new DateRecog();
     private List<FridgeObjects> foodList = new ArrayList<>();
-int ean = -1;
+    int ean = -1;
     private static final int RC_OCR_CAPTURE = 9003;
     private static final String TAG = "MainActivity";
 
@@ -37,14 +38,11 @@ int ean = -1;
         super.onCreate(savedInstanceState);
         setContentView(R.layout.preocr_menu);
 
-        /*ean = Integer.parseInt(getIntent().getExtras().getString("ean"));*/
-        ean = 123;
+        statusMessage = findViewById(R.id.status_message);
+        textValue = findViewById(R.id.text_value);
 
-        statusMessage = (TextView)findViewById(R.id.status_message);
-        textValue = (TextView)findViewById(R.id.text_value);
-
-        autoFocus = (CompoundButton) findViewById(R.id.auto_focus);
-        useFlash = (CompoundButton) findViewById(R.id.use_flash);
+        autoFocus = findViewById(R.id.auto_focus);
+        useFlash = findViewById(R.id.use_flash);
 
         findViewById(R.id.read_text).setOnClickListener(this);
     }
@@ -61,7 +59,6 @@ int ean = -1;
             Intent intent = new Intent(this, OcrCaptureActivity.class);
             intent.putExtra(OcrCaptureActivity.AutoFocus, autoFocus.isChecked());
             intent.putExtra(OcrCaptureActivity.UseFlash, useFlash.isChecked());
-
             startActivityForResult(intent, RC_OCR_CAPTURE);
         }
     }
@@ -99,26 +96,23 @@ int ean = -1;
                     textValue.setText(text);
 
                     String test = dateRecog.determineDateFormat(text);
-                    String ean = getIntent().getStringExtra("ean");
-                    int eanNo = Integer.parseInt(ean);
+
+                    Bundle extras = getIntent().getExtras();
+                    String barcode = extras.getString("ean");
+                    Log.i("information actres", barcode);
+
                     String FoodTypeName = getIntent().getStringExtra("choice");
 
                     if(test!=null){
-
                         SimpleDateFormat formatter = new SimpleDateFormat(test);
-
                         try {
                             Date date = formatter.parse(text);
-
-                           new FridgeObjects(FoodTypeName,date,eanNo).SendFridgeToDb(getBaseContext());
-
-
+                           new FridgeObjects(FoodTypeName,date,barcode).SendFridgeToDb(getBaseContext());
                         } catch (ParseException e) {
                             e.printStackTrace();
                             Log.i("information", "Error: " + e.getMessage());
                         }
                     }
-
                 } else {
                     statusMessage.setText(R.string.ocr_failure);
                     Log.d("information", "No Text captured, intent data is null");

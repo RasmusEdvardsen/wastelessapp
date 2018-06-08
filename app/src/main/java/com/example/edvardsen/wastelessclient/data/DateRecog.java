@@ -14,10 +14,12 @@ import java.util.regex.Pattern;
 public class DateRecog {
 
     private static final Map<String, String> DATE_FORMAT_REGEXPS = new HashMap<String, String>() {{
+        put("^\\d{1,2}/\\d{1,2}/\\d{2}$", "dd/MM/yy");
         put("^\\d{1,2}-\\d{1,2}-\\d{2}$", "dd-MM-yy");
-        put("^\\d{1,2}.\\d{1,2}.\\d{4}$", "dd.MM.yyyy");
-        put("^\\d{1,2}-\\d{1,2}-\\d{4}$", "dd-MM-yyyy");
         put("^\\d{1,2}.\\d{1,2}.\\d{2}$", "dd.MM.yy");
+        put("^\\d{1,2}/\\d{1,2}/\\d{4}$", "dd/MM/yyyy");
+        put("^\\d{1,2}-\\d{1,2}-\\d{4}$", "dd-MM-yyyy");
+        put("^\\d{1,2}.\\d{1,2}.\\d{4}$", "dd.MM.yyyy");
         put("^\\d{4}-\\d{1,2}-\\d{1,2}$", "yyyy-MM-dd");
         put("^\\d{1,2}/\\d{1,2}/\\d{4}$", "MM/dd/yyyy");
         put("^\\d{4}/\\d{1,2}/\\d{1,2}$", "yyyy/MM/dd");

@@ -62,7 +62,6 @@ public class LoginActivity extends Activity {
 
             @Override
             public void onClick(View view) {
-                Log.i("information", "login btn pressed");
                 final String emailInput = email.getText().toString();
                 final String passwordInput = password.getText().toString();
 
@@ -81,6 +80,10 @@ public class LoginActivity extends Activity {
 
                             if(httpURLConnection.getResponseCode() == 200){
                                 JSONObject jsonObject = JSONService.toJSONObject(httpURLConnection.getInputStream());
+                                UserModel.getInstance();
+                                UserModel.setEmail(jsonObject.getString("Email"));
+                                UserModel.setPassword(jsonObject.getString("Password"));
+                                UserModel.setUserID((Integer.parseInt(jsonObject.getString("UserID"))));
                                 Log.i("information", jsonObject.toString());
                                 startActivity(new Intent(getBaseContext(), MainActivity.class));
                             }
@@ -130,7 +133,7 @@ public class LoginActivity extends Activity {
                                     UserModel.getInstance();
                                     UserModel.setEmail(emailInput);
                                     UserModel.setPassword(passwordInput);
-UserModel.setUserID((Integer.parseInt(object.getString("UserID"))));
+                                    UserModel.setUserID((Integer.parseInt(object.getString("UserID"))));
                                     HandlerService.makeToast(getBaseContext(), "Success!", Toast.LENGTH_SHORT, 500);
                                     startActivity(new Intent(getBaseContext(), MainActivity.class));
                                 }else{

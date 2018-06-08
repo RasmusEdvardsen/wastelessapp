@@ -3,20 +3,16 @@ package com.example.edvardsen.wastelessclient.activities;
 
 import android.app.Activity;
 import android.content.pm.PackageManager;
+import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
-import android.support.v7.app.AppCompatActivity;
-import android.os.Bundle;
 import android.util.Log;
 import android.util.SparseArray;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 import android.widget.TextView;
 import android.widget.Toast;
-//import android.Manifest;
 
-
-import com.example.edvardsen.wastelessclient.Manifest;
 import com.example.edvardsen.wastelessclient.R;
 import com.example.edvardsen.wastelessclient.data.DateRecog;
 import com.google.android.gms.vision.CameraSource;
@@ -25,11 +21,12 @@ import com.google.android.gms.vision.text.TextBlock;
 import com.google.android.gms.vision.text.TextRecognizer;
 
 import java.io.IOException;
-import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
 import static android.Manifest.permission.CAMERA;
+
+//import android.Manifest;
 
 public class OcrActivity extends Activity {
 

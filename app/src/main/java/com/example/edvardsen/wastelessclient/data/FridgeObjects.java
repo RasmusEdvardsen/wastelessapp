@@ -33,10 +33,10 @@ public class FridgeObjects extends Activity {
 //Store Name
     public String name;
     //Store EAN
-    public int ean;
+    public String ean;
 
 
-    public FridgeObjects( String name, Date expDate, int ean){
+    public FridgeObjects( String name, Date expDate, String ean){
 
         this.expDate = expDate;
         this.name = name;
@@ -46,26 +46,12 @@ public class FridgeObjects extends Activity {
 
     public void SendFridgeToDb(final Context ctx){
 
-     // final Date finalexpDate = expDate;
-      // final String name = name;
-       final int userID = UserModel.getUserID();
-       //final int Ean = ;
-       //final int Ean =
-        //Int userID
-        //Int EAN
-        boolean isOk = false;
-
-      //  String newString;
-       // String ean = getIntent().getStringExtra("ean");
-       // String FoodTypeName = getIntent().getStringExtra("choice");
-
-
+        Log.i("information toDb", "userid: " + String.valueOf(UserModel.getUserID()) + " expdata: " + expDate.toString() + " name: " + name + " ean: " + ean);
         final String url = Constants.baseURL + Constants.productsPath;
         final String json = "{\"UserID\": " + "\"" + String.valueOf(UserModel.getUserID()) + "\","
-                + "\"EAN\": " + "\"" + String.valueOf(ean) + "\","
+                + "\"EAN\": " + "\"" + ean + "\","
                 + "\"FoodTypeName\": " + "\"" + name + "\","
                 + "\"ExpirationDate\": " + "\"" + DateFormat.format("yyyy-MM-dd", expDate) + "\"," + "}";
-       // final String json = "{\"UserID\":33,\"EAN\":123123123,\"FoodTypeName\":\"Milk\",\"ExpirationDate\":\"2018-10-06\"}";
         AsyncTask.execute(new Runnable() {
             @Override
             public void run() {

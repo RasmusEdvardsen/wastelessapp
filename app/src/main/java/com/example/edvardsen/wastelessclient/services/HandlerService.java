@@ -31,26 +31,19 @@ public class HandlerService {
         });
     }
 
-    public static void setBuilder(final Context ctx,final String[] scanResults){
-        Log.i("information", "HANDLER SERVICE A");
+    public static void setBuilder(final Context ctx, final String[] scanResults, final String barcode){
         new Handler(Looper.getMainLooper()).post(new Runnable(){
-
-
-
             @Override
             public void run() {
 
                 android.support.v7.app.AlertDialog.Builder builder = new android.support.v7.app.AlertDialog.Builder(ctx);
-                Log.i("information", " RUN LOG INSIDE HANDLER");
                 builder.setItems(scanResults, new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialogInterface, int i) {
-                        //the variable i is the chosen item in the dialog!
-                        Log.i("information", "LOG INSIDE HANDLER SERVICE");
-                        Log.i("information", String.valueOf(i));
                         Intent intent = new Intent(ctx, OcrResultActivity.class);
-                        intent.putExtra("choice", i);
-                        ctx.startActivity(new Intent(ctx, OcrResultActivity.class));
+                        intent.putExtra("choice", scanResults[i]);
+                        intent.putExtra("ean", barcode);
+                        ctx.startActivity(intent);
 
                     }
                 });
